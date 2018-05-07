@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Xuất mã vạch</string>
+    <string name="input_data">Nhập dữ liệu</string>
+    <string name="from">Từ</string>
+    <string name="to">Đến</string>
+    <string name="next">Kế tiếp</string>
+    <string name="export">Kết xuất</string>
+    <string name="choose_logo">Chọn logo</string>
+    <string name="choose_from_file">Chọn từ file</string>
+    <string name="loading">Vui lòng chờ</string>
+    <string name="input_min_wrong">\"Đến\" phải lớn hơn \"Từ\".</string>
+    <string name="input_empty">Vui lòng nhập đầy đủ.</string>
+    <string name="dialog_confirm">Tôi đã hiểu</string>
+    <string name="dialog_choose_again">Chọn lại</string>
+    <string name="dialog_error_title">Lỗi !</string>
+    <string name="warning">Cảnh báo !</string>
+    <string name="no_logo">Bạn có chắc không sử dụng logo chứ?</string>
+    <string name="configure_logo_message">Vui lòng chờ !\nĐang cấu hình logo.</string>
+    <string name="exporting">Đang xuất : $1/$2</string>
+    <string name="export_success">Xuất thành công, vui lòng kiểm tra thư mục : </string>
+    <string name="export_fail">Xuất không thành công, vui lòng xuất lại !</string>
+    <string name="success">Thành công !</string>
+</resources>

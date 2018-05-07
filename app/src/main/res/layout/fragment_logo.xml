@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--Title start-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:background="@color/colorRed500"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_logo"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_title" />
+    </LinearLayout>
+    <!--Title end-->
+
+    <!--Container start-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.9"
+        android:background="@color/colorRed300">
+
+        <!--Frame start-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/frame_margin"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.85"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <!--Line start-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.3"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnChoose"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/choose_from_file"
+                            android:textSize="@dimen/text_size_normal" />
+                    </LinearLayout>
+                    <!--Line end-->
+
+                    <!--Line start-->
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@color/colorRed300"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.7"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/imgLogo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:background="@drawable/anpham_logo" />
+                    </FrameLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnExport"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.15"
+                android:background="@color/colorBlue900"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/export"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_size_button" />
+            </LinearLayout>
+        </LinearLayout>
+        <!--Frame end-->
+    </LinearLayout>
+    <!--Container end-->
+</LinearLayout>
