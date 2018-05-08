@@ -76,7 +76,6 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
 
         imgLogo.setBackgroundColor(Color.WHITE);
         imgLogo.setImageBitmap(presenter.exportBitmap(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
-//        imgLogo.setImageBitmap(presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT));
     }
 
     @Override

@@ -62,6 +62,7 @@ public class LogoPresenter {
     }
 
     private final String TAG = getClass().getSimpleName();
+    private final int MAX_ITEM_WIDTH = 40;
 
     private LogoView view;
     private Activity activity;
@@ -208,11 +209,11 @@ public class LogoPresenter {
         //Draw logo
         if (logoBitmap == null)
             logoBitmap = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ALPHA_8);
-        Rect rectLogo = new Rect(0, canvas.getHeight() * 3 / 100, canvas.getWidth(), canvas.getHeight() * 38 / 100);
+        Rect rectLogo = new Rect(0, 8, canvas.getWidth(), 107);
         canvas.drawBitmap(logoBitmap, null, rectLogo, null);
 
         //Draw Barcode
-        Rect rectBarcode = new Rect(0, canvas.getHeight() * 41 / 100, canvas.getWidth(), canvas.getHeight() * 7 / 10);
+        Rect rectBarcode = new Rect(0, 114, canvas.getWidth(), 196);
         canvas.drawBitmap(barcodeBitmap, null, rectBarcode, null);
 
         //Draw number
@@ -221,23 +222,28 @@ public class LogoPresenter {
         pNumber.setTextSize(Constant.NUMBER_TEXT_SIZE);
         pNumber.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         int xPos = (int) ((canvas.getWidth() / 2) - (pNumber.measureText(String.format("%07d", number)) / 2));
-        int yPos = (int) ((canvas.getHeight() * 8.5 / 10) - ((pNumber.descent() + pNumber.ascent()) / 2));
+        int yPos = (int) ((238) - ((pNumber.descent() + pNumber.ascent()) / 2));
         canvas.drawText(String.format("%07d", number), xPos, yPos, pNumber);
 
         //Draw frame
-        Paint pFrame = new Paint();
-        pFrame.setColor(Color.BLACK);
-        pFrame.setStyle(Paint.Style.STROKE);
-        Rect r = new Rect(1, 1, canvas.getWidth() - 1, canvas.getHeight() - 1);
-        canvas.drawRect(r, pFrame);
+//        Paint pFrame = new Paint();
+//        pFrame.setColor(Color.BLACK);
+//        pFrame.setStyle(Paint.Style.STROKE);
+//        Rect r = new Rect(1, 1, canvas.getWidth() - 1, canvas.getHeight() - 1);
+//        canvas.drawRect(r, pFrame);
 
         return configureBitmap(flipAndRotate(exportBitmap), Color.TRANSPARENT, Color.WHITE, -1);
     }
 
     private Bitmap flipAndRotate(Bitmap src) {
         Matrix m = new Matrix();
+
+        //Rotate
         m.postRotate(-90);
-        m.preScale(1, -1);
+
+        //Flip
+//        m.preScale(1, -1);
+
         Bitmap dst = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), m, false);
         dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
         return dst;
@@ -256,7 +262,9 @@ public class LogoPresenter {
 
         public ExportTask(Bitmap logoBitmap, int from, int to) {
             this.from = from;
+            Log.d(TAG, "doInBackground: From : " + from);
             this.to = to;
+            Log.d(TAG, "doInBackground: To : " + to);
             this.logoBitmap = logoBitmap;
         }
 
@@ -270,23 +278,29 @@ public class LogoPresenter {
         protected Boolean doInBackground(Void... params) {
             try {
                 prepareFile();
+
+                //Create document
                 Document document = new Document();
-                document.setPageSize(new Rectangle(Constant.A4_WIDTH, Constant.A4_HEIGHT));
+                document.setPageSize(new Rectangle(Constant.A1_WIDTH, Constant.A1_HEIGHT));
                 document.setMargins(0, 0, 0, 0);
                 PdfWriter.getInstance(document, new FileOutputStream(fileHelper.getFile()));
                 document.open();
+                Log.d(TAG, "doInBackground: create document success");
 
                 validateFinishNumber();
-                Log.d(TAG, "doInBackground: To = " + to);
 
-                for (int i = from; i <= to; i += 12) {
-                    Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * 12, Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                for (int i = from; i <= to; i += MAX_ITEM_WIDTH) {
+                    Log.d(TAG, "doInBackground: create total bitmap");
+                    Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                            Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
                     Canvas canvas = new Canvas(totalBitmap);
+                    Log.d(TAG, "doInBackground: create total bitmap success");
 
                     int startNumber = i;
-                    int stopNumber = startNumber + 11;
+                    int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
                     int pos = 0;
                     for (int j = startNumber; j <= stopNumber; j++) {
+                        Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
                         publishProgress(pos + startNumber);
                         Bitmap bp = exportBitmap(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
                         Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
@@ -298,6 +312,16 @@ public class LogoPresenter {
                     totalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     Image image = Image.getInstance(stream.toByteArray());
                     document.add(image);
+
+                    //Create space
+                    Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                            Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                    spaceBitmap.eraseColor(Color.WHITE);
+                    ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+                    spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+                    Image image2 = Image.getInstance(stream2.toByteArray());
+                    document.add(image2);
+
                 }
                 document.close();
 
@@ -309,16 +333,27 @@ public class LogoPresenter {
                 Log.d(TAG, "export: Convert success");
                 return true;
             } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(TAG, "doInBackground: " + e.getMessage());
                 return false;
             }
         }
 
         private void validateFinishNumber() {
-            int temp = to;
-            while (temp % 12 == 0) {
-                temp = temp++;
+            if (to < MAX_ITEM_WIDTH)
+                to = MAX_ITEM_WIDTH;
+            else if (to > MAX_ITEM_WIDTH) {
+                if (to % MAX_ITEM_WIDTH != 0) {
+                    int temp = to;
+                    while (true) {
+                        temp = temp + 1;
+                        if (temp % MAX_ITEM_WIDTH == 0) {
+                            break;
+                        }
+                    }
+                    to = temp;
+                }
             }
-            to = temp;
         }
 
         @Override

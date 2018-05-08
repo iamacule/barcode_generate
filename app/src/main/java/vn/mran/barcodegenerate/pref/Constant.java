@@ -12,10 +12,10 @@ public interface Constant {
     int ACTION_EXPORT = 1;
 
 
-    int A4_WIDTH = 3508;
-    int A4_HEIGHT = 2480;
+    int A1_WIDTH = 14043;
+    int A1_HEIGHT = 9933;
     int PRINT_WIDTH = 530;
-    int PRINT_HEIGHT = 280;
+    int PRINT_HEIGHT = 350;
     int LOGO_HEIGHT = 84;
     int BARCODE_HEIGHT = 105;
     int NUMBER_TEXT_SIZE = 70;
