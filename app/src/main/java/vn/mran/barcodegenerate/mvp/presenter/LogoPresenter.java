@@ -314,13 +314,15 @@ public class LogoPresenter {
                     document.add(image);
 
                     //Create space
-                    Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                            Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
-                    spaceBitmap.eraseColor(Color.WHITE);
-                    ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-                    spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-                    Image image2 = Image.getInstance(stream2.toByteArray());
-                    document.add(image2);
+                    if (i + MAX_ITEM_WIDTH <= to) {
+                        Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                                Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                        spaceBitmap.eraseColor(Color.WHITE);
+                        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+                        spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+                        Image image2 = Image.getInstance(stream2.toByteArray());
+                        document.add(image2);
+                    }
 
                 }
                 document.close();
