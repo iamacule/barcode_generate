@@ -41,6 +41,7 @@ import vn.mran.barcodegenerate.pref.Constant;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static vn.mran.barcodegenerate.pref.Constant.MAX_ITEM_WIDTH;
 
 /**
  * Created by Mr An on 20/09/2017.
@@ -62,7 +63,6 @@ public class LogoPresenter {
     }
 
     private final String TAG = getClass().getSimpleName();
-    private final int MAX_ITEM_WIDTH = 40;
 
     private LogoView view;
     private Activity activity;
@@ -315,7 +315,7 @@ public class LogoPresenter {
 
                     //Create space
                     Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                            Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                            Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
                     spaceBitmap.eraseColor(Color.WHITE);
                     ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
                     spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
