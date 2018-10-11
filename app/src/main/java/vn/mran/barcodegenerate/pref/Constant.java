@@ -17,7 +17,7 @@ public interface Constant {
     int A1_HEIGHT = 9933;
     int PRINT_WIDTH = 400;
     int PRINT_HEIGHT = 350;
-    int SPACE_HEIGHT = 600;
+    int SPACE_HEIGHT = 144;
     int LOGO_HEIGHT = 70;
     int BARCODE_HEIGHT = 70;
     int NUMBER_TEXT_SIZE = 80;

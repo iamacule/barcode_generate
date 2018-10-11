@@ -23,6 +23,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -281,7 +282,7 @@ public class LogoPresenter {
 
                 //Create document
                 Document document = new Document();
-                document.setPageSize(new Rectangle(Constant.A1_WIDTH, Constant.A1_HEIGHT));
+                document.setPageSize(PageSize.A1);
                 document.setMargins(0, 0, 0, 0);
                 PdfWriter.getInstance(document, new FileOutputStream(fileHelper.getFile()));
                 document.open();
@@ -311,6 +312,7 @@ public class LogoPresenter {
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     totalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     Image image = Image.getInstance(stream.toByteArray());
+                    image.scalePercent(24f);
                     document.add(image);
 
                     //Create space
@@ -321,6 +323,7 @@ public class LogoPresenter {
                         ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
                         spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
                         Image image2 = Image.getInstance(stream2.toByteArray());
+                        image.scalePercent(24f);
                         document.add(image2);
                     }
 
