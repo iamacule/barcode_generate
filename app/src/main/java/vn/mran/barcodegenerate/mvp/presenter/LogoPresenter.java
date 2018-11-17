@@ -282,7 +282,7 @@ public class LogoPresenter {
 
                 //Create document
                 Document document = new Document();
-                document.setPageSize(PageSize.A1);
+                document.setPageSize(PageSize.A3);
                 document.setMargins(0, 0, 0, 0);
                 PdfWriter.getInstance(document, new FileOutputStream(fileHelper.getFile()));
                 document.open();
@@ -316,16 +316,14 @@ public class LogoPresenter {
                     document.add(image);
 
                     //Create space
-                    if (i + MAX_ITEM_WIDTH <= to) {
-                        Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                                Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
-                        spaceBitmap.eraseColor(Color.WHITE);
-                        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-                        spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-                        Image image2 = Image.getInstance(stream2.toByteArray());
-                        image.scalePercent(24f);
-                        document.add(image2);
-                    }
+                    Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                            Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                    spaceBitmap.eraseColor(Color.WHITE);
+                    ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+                    spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+                    Image image2 = Image.getInstance(stream2.toByteArray());
+                    image.scalePercent(24f);
+                    document.add(image2);
 
                 }
                 document.close();
