@@ -7,11 +7,13 @@ package vn.mran.barcodegenerate.pref;
 public interface Constant {
     int SELECT_LOGO_CODE = 0;
     int ID_CALLBACK_WRITE_EXTERNAL_STORAGE_PERMISSION = 0;
+    int TOTAL_ITEM_IN_FILE = 200;
 
     int ACTION_CHOOSE_PICTURE = 0;
     int ACTION_EXPORT = 1;
 
     int MAX_ITEM_WIDTH = 20;
+    int MAX_ITEM_HEIGHT = 20;
 
     int A1_WIDTH = 7016;
     int A1_HEIGHT = 9933;
@@ -24,5 +26,5 @@ public interface Constant {
 
     String BARCODE_EXPORT_FOLDER_NAME = "/BARCODE_EXPORT";
     String FILE_NAME_FORMAT = "yyyyMMdd-hhmm";
-    String EXTENSION_NAME = ".pdf";
+    String EXTENSION_NAME = ".tif";
 }

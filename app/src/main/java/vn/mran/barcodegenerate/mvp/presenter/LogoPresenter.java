@@ -27,6 +27,10 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import org.beyka.tiffbitmapfactory.CompressionScheme;
+import org.beyka.tiffbitmapfactory.Orientation;
+import org.beyka.tiffbitmapfactory.TiffSaver;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,7 +46,9 @@ import vn.mran.barcodegenerate.pref.Constant;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static vn.mran.barcodegenerate.pref.Constant.MAX_ITEM_HEIGHT;
 import static vn.mran.barcodegenerate.pref.Constant.MAX_ITEM_WIDTH;
+import static vn.mran.barcodegenerate.pref.Constant.TOTAL_ITEM_IN_FILE;
 
 /**
  * Created by Mr An on 20/09/2017.
@@ -280,55 +286,102 @@ public class LogoPresenter {
             try {
                 prepareFile();
 
-                //Create document
-                Document document = new Document();
-                document.setPageSize(PageSize.A1);
-                document.setMargins(0, 0, 0, 0);
-                PdfWriter.getInstance(document, new FileOutputStream(fileHelper.getFile()));
-                document.open();
-                Log.d(TAG, "doInBackground: create document success");
-
+                //Validate finish number.
                 validateFinishNumber();
 
-                for (int i = from; i <= to; i += MAX_ITEM_WIDTH) {
-                    Log.d(TAG, "doInBackground: create total bitmap");
-                    Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                            Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
-                    Canvas canvas = new Canvas(totalBitmap);
-                    Log.d(TAG, "doInBackground: create total bitmap success");
+                //Count total file
+                int totalFile = (to / TOTAL_ITEM_IN_FILE) + 1;
+                Log.d(TAG, "Total file = " + totalFile);
 
-                    int startNumber = i;
-                    int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
-                    int pos = 0;
-                    for (int j = startNumber; j <= stopNumber; j++) {
-                        Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
-                        publishProgress(pos + startNumber);
-                        Bitmap bp = exportBitmap(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
-                        Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
-                        canvas.drawBitmap(bp, null, rect, null);
-                        pos++;
+                //Loop for create each file
+                for (int fileCount = 0; fileCount < totalFile; fileCount++) {
+                    Log.d(TAG, "Create file #" + (fileCount + 1));
+                    Bitmap bpTif = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                            Constant.PRINT_WIDTH * MAX_ITEM_HEIGHT, Bitmap.Config.ARGB_8888);
+                    Canvas canvasTif = new Canvas(bpTif);
+                    int fromOfFile = (fileCount * TOTAL_ITEM_IN_FILE) + 1;
+                    int toOfFile = fromOfFile + TOTAL_ITEM_IN_FILE - 1;
+                    int posLine = 0;
+
+                    for (int i = fromOfFile; i <= toOfFile; i += MAX_ITEM_WIDTH) {
+                        if (i + MAX_ITEM_WIDTH - 1 <= to) {
+                            Bitmap bpLine = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                                    Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                            Canvas canvasLine = new Canvas(bpLine);
+                            int startNumber = i;
+                            int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
+                            int posItem = 0;
+                            for (int j = startNumber; j <= stopNumber; j++) {
+                                Log.d(TAG, "Export #" + j);
+                                publishProgress(posItem + startNumber);
+                                Bitmap bp = exportBitmap(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
+                                Rect rect = new Rect(Constant.PRINT_HEIGHT * posItem, 0, (Constant.PRINT_HEIGHT * posItem) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
+                                canvasLine.drawBitmap(bp, null, rect, null);
+                                posItem++;
+                            }
+                            Rect rect = new Rect(0, Constant.PRINT_HEIGHT * posLine, Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                                    (Constant.PRINT_HEIGHT * posLine) + Constant.PRINT_HEIGHT);
+                            canvasTif.drawBitmap(bpLine, null, rect, null);
+                            posLine++;
+
+                            if (i + MAX_ITEM_WIDTH - 1 <= toOfFile) {
+                                Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                                        Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                                rect = new Rect(0, Constant.PRINT_HEIGHT * posLine, Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                                        (Constant.PRINT_HEIGHT * posLine) + Constant.PRINT_HEIGHT);
+                                canvasTif.drawBitmap(spaceBitmap, null, rect, null);
+                                posLine++;
+                            }
+                        }
                     }
-
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    totalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    Image image = Image.getInstance(stream.toByteArray());
-                    image.scalePercent(24f);
-                    document.add(image);
-
-                    //Create space
-                    if (i + MAX_ITEM_WIDTH <= to) {
-                        Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                                Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
-                        spaceBitmap.eraseColor(Color.WHITE);
-                        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-                        spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-                        Image image2 = Image.getInstance(stream2.toByteArray());
-                        image.scalePercent(24f);
-                        document.add(image2);
-                    }
-
+                    TiffSaver.SaveOptions options = new TiffSaver.SaveOptions();
+                    options.compressionScheme = CompressionScheme.LZW;
+                    options.orientation = Orientation.LEFT_TOP;
+                    options.author = "beyka";
+                    options.copyright = "Some copyright";
+                    TiffSaver.saveBitmap(fileHelper.getFile().getAbsolutePath(), bpTif, options);
                 }
-                document.close();
+
+//
+//                for (int i = from; i <= to; i += MAX_ITEM_WIDTH) {
+//                    Log.d(TAG, "doInBackground: create total bitmap");
+//                    Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+//                            Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+//                    Canvas canvas = new Canvas(totalBitmap);
+//                    Log.d(TAG, "doInBackground: create total bitmap success");
+//
+//                    int startNumber = i;
+//                    int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
+//                    int pos = 0;
+//                    for (int j = startNumber; j <= stopNumber; j++) {
+//                        Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
+//                        publishProgress(pos + startNumber);
+//                        Bitmap bp = exportBitmap(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
+//                        Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
+//                        canvas.drawBitmap(bp, null, rect, null);
+//                        pos++;
+//                    }
+//
+//                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                    totalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//                    Image image = Image.getInstance(stream.toByteArray());
+//                    image.scalePercent(24f);
+//                    document.add(image);
+//
+//                    //Create space
+//                    if (i + MAX_ITEM_WIDTH <= to) {
+//                        Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+//                                Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+//                        spaceBitmap.eraseColor(Color.WHITE);
+//                        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+//                        spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+//                        Image image2 = Image.getInstance(stream2.toByteArray());
+//                        image.scalePercent(24f);
+//                        document.add(image2);
+//                    }
+//
+//                }
+//                document.close();
 
                 try {
                     Runtime.getRuntime().exec("sync");
