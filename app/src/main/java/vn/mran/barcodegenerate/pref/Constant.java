@@ -12,6 +12,8 @@ public interface Constant {
     int ACTION_EXPORT = 1;
 
     int MAX_ITEM_WIDTH = 10;
+    int MAX_ITEM_HEIGHT = 5;
+    int MAX_ITEM_IN_ONE_PAGE = MAX_ITEM_WIDTH * MAX_ITEM_HEIGHT;
 
     int PRINT_WIDTH = 400;
     int PRINT_HEIGHT = 350;
@@ -21,6 +23,7 @@ public interface Constant {
     int NUMBER_TEXT_SIZE = 80;
 
     String BARCODE_EXPORT_FOLDER_NAME = "/BARCODE_EXPORT";
-    String FILE_NAME_FORMAT = "yyyyMMdd-hhmm";
+    String MAIN_FILE_NAME_FORMAT = "yyyyMMdd-HHmm";
+    String FOREGROUND_FILE_NAME_EXTENSION = "-FOREGROUND";
     String EXTENSION_NAME = ".pdf";
 }

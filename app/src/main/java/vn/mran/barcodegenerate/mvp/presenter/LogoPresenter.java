@@ -21,10 +21,11 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
+import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
@@ -42,6 +43,7 @@ import vn.mran.barcodegenerate.pref.Constant;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static vn.mran.barcodegenerate.pref.Constant.MAX_ITEM_IN_ONE_PAGE;
 import static vn.mran.barcodegenerate.pref.Constant.MAX_ITEM_WIDTH;
 
 /**
@@ -202,7 +204,7 @@ public class LogoPresenter {
         return message.replace("$1", String.valueOf(value)).replace("$2", String.valueOf(total)).toString();
     }
 
-    public Bitmap exportBitmap(Bitmap logoBitmap, Bitmap barcodeBitmap, int number) {
+    public Bitmap exportItem(Bitmap logoBitmap, Bitmap barcodeBitmap, int number) {
         Bitmap exportBitmap = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.PRINT_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
         Canvas canvas = new Canvas(exportBitmap);
 
@@ -236,6 +238,24 @@ public class LogoPresenter {
         return configureBitmap(flipAndRotate(exportBitmap), Color.TRANSPARENT, Color.WHITE, -1);
     }
 
+    public Bitmap exportForeground(Bitmap logoBitmap) {
+        Bitmap exportBitmap = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.PRINT_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+        Canvas canvas = new Canvas(exportBitmap);
+
+        //Draw logo
+        if (logoBitmap == null)
+            logoBitmap = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ALPHA_8);
+        Rect rectLogo = new Rect(0, 8, canvas.getWidth(), 107);
+        canvas.drawBitmap(logoBitmap, null, rectLogo, null);
+//        //Draw logo
+//        Bitmap bpColor = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ARGB_8888);
+//        bpColor.eraseColor(color);
+//        Rect rectColor = new Rect(0, 8, canvas.getWidth(), 107);
+//        canvas.drawBitmap(bpColor, null, rectColor, null);
+
+        return configureBitmap(flipAndRotate(exportBitmap), Color.TRANSPARENT, Color.WHITE, -1);
+    }
+
     private Bitmap flipAndRotate(Bitmap src) {
         Matrix m = new Matrix();
 
@@ -251,15 +271,18 @@ public class LogoPresenter {
     }
 
     public void export(Bitmap logoBitmap, int from, int to, int fgColor) {
-        new ExportTask(logoBitmap, from, to,fgColor).execute(new Void[]{});
+        new ExportTask(logoBitmap, from, to, fgColor).execute(new Void[]{});
     }
 
     private class ExportTask extends AsyncTask<Void, Integer, Boolean> {
 
-        private FileHelper fileHelper;
+        private FileHelper mainFile;
+        private FileHelper foregroundFile;
         private Bitmap logoBitmap;
         private int from;
         private int to;
+        private int fgColor;
+        private boolean isCreateMainFile = true;
 
         public ExportTask(Bitmap logoBitmap, int from, int to, int fgColor) {
             this.from = from;
@@ -267,6 +290,7 @@ public class LogoPresenter {
             this.to = to;
             Log.d(TAG, "doInBackground: To : " + to);
             this.logoBitmap = logoBitmap;
+            this.fgColor = fgColor;
         }
 
         @Override
@@ -281,11 +305,11 @@ public class LogoPresenter {
                 prepareFile();
 
                 //Create document
-                Document document = new Document();
-                document.setPageSize(PageSize.A3);
-                document.setMargins(0, 0, 0, 0);
-                PdfWriter.getInstance(document, new FileOutputStream(fileHelper.getFile()));
-                document.open();
+                Document mainPDFFile = new Document();
+                mainPDFFile.setPageSize(PageSize.A3);
+                mainPDFFile.setMargins(0, 0, 0, 0);
+                PdfWriter.getInstance(mainPDFFile, new FileOutputStream(mainFile.getFile()));
+                mainPDFFile.open();
                 Log.d(TAG, "doInBackground: create document success");
 
                 validateFinishNumber();
@@ -303,7 +327,7 @@ public class LogoPresenter {
                     for (int j = startNumber; j <= stopNumber; j++) {
                         Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
                         publishProgress(pos + startNumber);
-                        Bitmap bp = exportBitmap(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
+                        Bitmap bp = exportItem(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
                         Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
                         canvas.drawBitmap(bp, null, rect, null);
                         pos++;
@@ -313,20 +337,62 @@ public class LogoPresenter {
                     totalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     Image image = Image.getInstance(stream.toByteArray());
                     image.scalePercent(24f);
-                    document.add(image);
+                    mainPDFFile.add(image);
 
                     //Create space
-                    Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                            Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
-                    spaceBitmap.eraseColor(Color.WHITE);
-                    ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-                    spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-                    Image image2 = Image.getInstance(stream2.toByteArray());
-                    image.scalePercent(24f);
-                    document.add(image2);
+                    mainPDFFile.add(createSpace());
 
                 }
-                document.close();
+                mainPDFFile.close();
+
+
+                //Create foreground file
+                if (fgColor != -1) {
+                    isCreateMainFile = false;
+                    prepareForegroundFile();
+
+                    //Create document
+                    Document fgPDFFile = new Document();
+                    fgPDFFile.setPageSize(PageSize.A3);
+                    fgPDFFile.setMargins(0, 0, 0, 0);
+                    PdfWriter.getInstance(fgPDFFile, new FileOutputStream(foregroundFile.getFile()));
+                    fgPDFFile.open();
+
+                    int maxItem = getMaxItem(to);
+
+                    Bitmap fgLogo = convertLogo(logoBitmap, fgColor);
+
+                    for (int i = 1; i <= maxItem; i += MAX_ITEM_WIDTH) {
+                        Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                                Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                        Canvas canvas = new Canvas(totalBitmap);
+                        Log.d(TAG, "doInBackground: create total bitmap success");
+
+                        int startNumber = i;
+                        int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
+                        int pos = 0;
+                        for (int j = startNumber; j <= stopNumber; j++) {
+                            Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
+                            publishProgress(pos + startNumber);
+                            Bitmap bp = exportForeground(fgLogo);
+                            Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
+                            canvas.drawBitmap(bp, null, rect, null);
+                            pos++;
+                        }
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        totalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        Image image = Image.getInstance(stream.toByteArray());
+                        image.scalePercent(24f);
+                        fgPDFFile.add(image);
+
+                        //Create space
+                        fgPDFFile.add(createSpace());
+
+                    }
+
+                    fgPDFFile.close();
+                }
 
                 try {
                     Runtime.getRuntime().exec("sync");
@@ -340,6 +406,49 @@ public class LogoPresenter {
                 Log.e(TAG, "doInBackground: " + e.getMessage());
                 return false;
             }
+        }
+
+        private Bitmap convertLogo(Bitmap logoBitmap, int fgColor) {
+            int width = logoBitmap.getWidth();
+            int height = logoBitmap.getHeight();
+            int[] pixels = new int[width * height];
+            logoBitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+            for (int x = 0; x < pixels.length; ++x) {
+                pixels[x] = (pixels[x] != Color.TRANSPARENT) ? fgColor : pixels[x];
+            }
+
+            Bitmap newImage = Bitmap.createBitmap(width, height, logoBitmap.getConfig());
+            newImage.setPixels(pixels, 0, width, 0, 0, width, height);
+            return newImage;
+        }
+
+        private int getMaxItem(int to) {
+            int maxItem;
+            if (to >= MAX_ITEM_IN_ONE_PAGE) {
+                maxItem = MAX_ITEM_IN_ONE_PAGE;
+            } else {
+                maxItem = to;
+            }
+
+            return maxItem;
+        }
+
+        private Element createSpace() {
+            Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
+                    Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+            spaceBitmap.eraseColor(Color.WHITE);
+            ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+            spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
+            Image image2 = null;
+            try {
+                image2 = Image.getInstance(stream2.toByteArray());
+            } catch (BadElementException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return image2;
         }
 
         private void validateFinishNumber() {
@@ -362,7 +471,11 @@ public class LogoPresenter {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            view.onExportProgressUpdate(convertProgress(activity.getString(R.string.exporting), values[0], to));
+            if (isCreateMainFile) {
+                view.onExportProgressUpdate(convertProgress(activity.getString(R.string.exporting), values[0], to));
+            } else {
+                view.onExportProgressUpdate(activity.getString(R.string.exporting_fg));
+            }
         }
 
         @Override
@@ -375,9 +488,14 @@ public class LogoPresenter {
         }
 
         private void prepareFile() {
-            fileHelper = new FileHelper();
-            fileHelper.generateFile(new SimpleDateFormat(Constant.FILE_NAME_FORMAT).format(new Date()).toString() + Constant.EXTENSION_NAME);
+            mainFile = new FileHelper();
+            mainFile.generateFile(new SimpleDateFormat(Constant.MAIN_FILE_NAME_FORMAT).format(new Date()).toString() + Constant.EXTENSION_NAME);
         }
 
+        private void prepareForegroundFile() {
+            foregroundFile = new FileHelper();
+            foregroundFile.generateFile(new SimpleDateFormat(Constant.MAIN_FILE_NAME_FORMAT).format(new Date()).toString() +
+                    Constant.FOREGROUND_FILE_NAME_EXTENSION + Constant.EXTENSION_NAME);
+        }
     }
 }

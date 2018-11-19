@@ -17,6 +17,7 @@
     <string name="no_logo">Bạn có chắc không sử dụng logo chứ?</string>
     <string name="configure_logo_message">Vui lòng chờ !\nĐang cấu hình logo.</string>
     <string name="exporting">Đang xuất : $1/$2</string>
+    <string name="exporting_fg">Đang khởi tạo bản phủ nền</string>
     <string name="export_success">Xuất thành công, vui lòng kiểm tra thư mục : </string>
     <string name="export_fail">Xuất không thành công, vui lòng xuất lại !</string>
     <string name="success">Thành công !</string>

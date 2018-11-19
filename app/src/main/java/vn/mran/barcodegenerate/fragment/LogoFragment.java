@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -63,6 +64,16 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
     public void initAction() {
         btnChoose.setOnClickListener(this);
         btnExport.setOnClickListener(this);
+        cbFG.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    edtFBColor.setEnabled(true);
+                } else {
+                    edtFBColor.setEnabled(false);
+                }
+            }
+        });
     }
 
     @Override
@@ -81,7 +92,7 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
         this.to = to;
 
         imgLogo.setBackgroundColor(Color.WHITE);
-        imgLogo.setImageBitmap(presenter.exportBitmap(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
+        imgLogo.setImageBitmap(presenter.exportItem(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
     }
 
     @Override
@@ -139,7 +150,7 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
             case Constant.ACTION_EXPORT:
                 if (cbFG.isEnabled()) {
                     try {
-                        presenter.export(bpLogo, from, to, Color.parseColor(edtFBColor.getText().toString().trim()));
+                        presenter.export(bpLogo, from, to, Color.parseColor("#"+edtFBColor.getText().toString().trim()));
                     } catch (Exception e) {
                         presenter.export(bpLogo, from, to, -1);
                     }
@@ -154,7 +165,7 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
     public void onGetLogoSuccess(Bitmap bp) {
         this.bpLogo = bp;
         dialogProgress.dismiss();
-        imgLogo.setImageBitmap(presenter.exportBitmap(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
+        imgLogo.setImageBitmap(presenter.exportItem(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
         cbFG.setEnabled(true);
     }
 
