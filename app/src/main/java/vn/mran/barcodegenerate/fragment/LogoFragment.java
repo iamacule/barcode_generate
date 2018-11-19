@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -30,6 +32,8 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
     private Button btnChoose;
     private ImageView imgLogo;
     private LinearLayout btnExport;
+    private CheckBox cbFG;
+    private EditText edtFBColor;
 
     private LogoPresenter presenter;
     private DialogProgress.Build dialogProgress;
@@ -43,6 +47,8 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
         btnChoose = (Button) view.findViewById(R.id.btnChoose);
         imgLogo = (ImageView) view.findViewById(R.id.imgLogo);
         btnExport = (LinearLayout) view.findViewById(R.id.btnExport);
+        cbFG = (CheckBox) view.findViewById(R.id.cbFG);
+        edtFBColor = (EditText) view.findViewById(R.id.edtFBColor);
 
         TouchEffect.addAlpha(btnExport);
     }
@@ -131,7 +137,15 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
                 break;
 
             case Constant.ACTION_EXPORT:
-                presenter.export(bpLogo,from,to);
+                if (cbFG.isEnabled()) {
+                    try {
+                        presenter.export(bpLogo, from, to, Color.parseColor(edtFBColor.getText().toString().trim()));
+                    } catch (Exception e) {
+                        presenter.export(bpLogo, from, to, -1);
+                    }
+                } else {
+                    presenter.export(bpLogo, from, to, -1);
+                }
                 break;
         }
     }
@@ -141,6 +155,7 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
         this.bpLogo = bp;
         dialogProgress.dismiss();
         imgLogo.setImageBitmap(presenter.exportBitmap(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
+        cbFG.setEnabled(true);
     }
 
     @Override

@@ -70,10 +70,10 @@
                     <!--Line start-->
                     <FrameLayout
                         android:layout_width="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@color/colorRed300"
                         android:layout_height="0dp"
-                        android:layout_weight="0.7"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.5"
+                        android:background="@color/colorRed300"
                         android:gravity="center">
 
                         <ImageView
@@ -83,6 +83,59 @@
                             android:layout_gravity="center"
                             android:background="@drawable/anpham_logo" />
                     </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.2"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="0.5">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="0.2"
+                                android:gravity="center">
+
+                                <CheckBox
+                                    android:id="@+id/cbFG"
+                                    android:enabled="false"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="0.5"
+                                android:gravity="center|left">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/fg_question" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="0.3"
+                                android:gravity="center|left">
+
+                                <EditText
+                                    android:id="@+id/edtFBColor"
+                                    android:enabled="false"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="FFFFFF" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </LinearLayout>

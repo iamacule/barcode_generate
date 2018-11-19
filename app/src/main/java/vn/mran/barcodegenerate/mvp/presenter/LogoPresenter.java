@@ -250,8 +250,8 @@ public class LogoPresenter {
         return dst;
     }
 
-    public void export(Bitmap logoBitmap, int from, int to) {
-        new ExportTask(logoBitmap, from, to).execute(new Void[]{});
+    public void export(Bitmap logoBitmap, int from, int to, int fgColor) {
+        new ExportTask(logoBitmap, from, to,fgColor).execute(new Void[]{});
     }
 
     private class ExportTask extends AsyncTask<Void, Integer, Boolean> {
@@ -261,7 +261,7 @@ public class LogoPresenter {
         private int from;
         private int to;
 
-        public ExportTask(Bitmap logoBitmap, int from, int to) {
+        public ExportTask(Bitmap logoBitmap, int from, int to, int fgColor) {
             this.from = from;
             Log.d(TAG, "doInBackground: From : " + from);
             this.to = to;

@@ -20,4 +20,5 @@
     <string name="export_success">Xuất thành công, vui lòng kiểm tra thư mục : </string>
     <string name="export_fail">Xuất không thành công, vui lòng xuất lại !</string>
     <string name="success">Thành công !</string>
+    <string name="fg_question">Khởi tạo phủ nền logo</string>
 </resources>
