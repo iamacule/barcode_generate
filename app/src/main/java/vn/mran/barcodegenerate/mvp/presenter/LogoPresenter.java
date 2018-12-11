@@ -307,7 +307,7 @@ public class LogoPresenter {
                 //Create document
                 Document mainPDFFile = new Document();
                 mainPDFFile.setPageSize(PageSize.A3);
-                mainPDFFile.setMargins(0, 0, 0, 0);
+                mainPDFFile.setMargins(5, 0, 0, 0);
                 PdfWriter.getInstance(mainPDFFile, new FileOutputStream(mainFile.getFile()));
                 mainPDFFile.open();
                 Log.d(TAG, "doInBackground: create document success");
@@ -340,7 +340,7 @@ public class LogoPresenter {
                     mainPDFFile.add(image);
 
                     //Create space
-                    mainPDFFile.add(createSpace());
+                    mainPDFFile.add(createSpace(i));
 
                 }
                 mainPDFFile.close();
@@ -387,7 +387,7 @@ public class LogoPresenter {
                         fgPDFFile.add(image);
 
                         //Create space
-                        fgPDFFile.add(createSpace());
+                        fgPDFFile.add(createSpace(i));
 
                     }
 
@@ -434,9 +434,14 @@ public class LogoPresenter {
             return maxItem;
         }
 
-        private Element createSpace() {
+        private Element createSpace(int pos) {
+            int spaceHeight;
+            if (pos!=1){
+                spaceHeight = Constant.SPACE_HEIGHT - 3;
+            } else
+                spaceHeight = Constant.SPACE_HEIGHT;
             Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
-                    Constant.SPACE_HEIGHT, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                    spaceHeight, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
             spaceBitmap.eraseColor(Color.WHITE);
             ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
             spaceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
