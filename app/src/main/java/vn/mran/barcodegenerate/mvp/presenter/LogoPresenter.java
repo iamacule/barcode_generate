@@ -211,12 +211,12 @@ public class LogoPresenter {
 
         //Draw logo
         if (logoBitmap == null)
-            logoBitmap = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ALPHA_8);
-        Rect rectLogo = new Rect(0, 8, canvas.getWidth(), 107);
+            logoBitmap = Bitmap.createBitmap(Constant.LOGO_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ALPHA_8);
+        Rect rectLogo = new Rect(5, 18, canvas.getWidth() - 5, 105);
         canvas.drawBitmap(logoBitmap, null, rectLogo, null);
 
         //Draw Barcode
-        Rect rectBarcode = new Rect(0, 114, canvas.getWidth(), 196);
+        Rect rectBarcode = new Rect(5, 119, canvas.getWidth() - 5, 186);
         canvas.drawBitmap(barcodeBitmap, null, rectBarcode, null);
 
         //Draw number
@@ -225,7 +225,7 @@ public class LogoPresenter {
         pNumber.setTextSize(Constant.NUMBER_TEXT_SIZE);
         pNumber.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         int xPos = (int) ((canvas.getWidth() / 2) - (pNumber.measureText(String.format("%07d", number)) / 2));
-        int yPos = (int) ((238) - ((pNumber.descent() + pNumber.ascent()) / 2));
+        int yPos = (int) ((228) - ((pNumber.descent() + pNumber.ascent()) / 2));
         canvas.drawText(String.format("%07d", number), xPos, yPos, pNumber);
 
         //Draw frame
@@ -243,9 +243,10 @@ public class LogoPresenter {
         Canvas canvas = new Canvas(exportBitmap);
 
         //Draw logo
+
         if (logoBitmap == null)
-            logoBitmap = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ALPHA_8);
-        Rect rectLogo = new Rect(0, 8, canvas.getWidth(), 107);
+            logoBitmap = Bitmap.createBitmap(Constant.LOGO_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ALPHA_8);
+        Rect rectLogo = new Rect(5, 18, canvas.getWidth() - 5, 105);
         canvas.drawBitmap(logoBitmap, null, rectLogo, null);
 //        //Draw logo
 //        Bitmap bpColor = Bitmap.createBitmap(Constant.PRINT_WIDTH, Constant.LOGO_HEIGHT, Bitmap.Config.ARGB_8888);

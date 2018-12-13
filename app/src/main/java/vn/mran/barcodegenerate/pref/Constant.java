@@ -18,9 +18,10 @@ public interface Constant {
     int PRINT_WIDTH = 400;
     int PRINT_HEIGHT = 350;
     int SPACE_HEIGHT = 130;
-    int LOGO_HEIGHT = 70;
+    int LOGO_WIDTH = 390;
+    int LOGO_HEIGHT = 58;
     int BARCODE_HEIGHT = 70;
-    int NUMBER_TEXT_SIZE = 80;
+    int NUMBER_TEXT_SIZE = 75;
 
     String BARCODE_EXPORT_FOLDER_NAME = "/BARCODE_EXPORT";
     String MAIN_FILE_NAME_FORMAT = "yyyyMMdd-HHmm";
