@@ -7,4 +7,6 @@
     <color name="colorRed500">#F44336</color>
     <color name="colorRed300">#E57373</color>
     <color name="colorBlue900">#0D47A1</color>
+    <color name="colorGreen">#00c853</color>
+    <color name="colorGray">#efebe9</color>
 </resources>

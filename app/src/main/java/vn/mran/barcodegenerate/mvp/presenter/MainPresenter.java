@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import vn.mran.barcodegenerate.MainActivity;
 import vn.mran.barcodegenerate.R;
 import vn.mran.barcodegenerate.base.BaseFragment;
+import vn.mran.barcodegenerate.fragment.ChooserFragment;
 import vn.mran.barcodegenerate.fragment.InputFragment;
 import vn.mran.barcodegenerate.helper.FragmentNavigator;
 
@@ -29,11 +30,11 @@ public class MainPresenter {
     private void initFragmentNavigator() {
         fragmentNavigator = new FragmentNavigator(((MainActivity) mainView).getSupportFragmentManager(), R.id.container, R.anim.slide_in_left, R.anim.slide_in_right,
                 R.anim.slide_in_right, R.anim.slide_out_right);
-        fragmentNavigator.setRootFragment(new InputFragment());
+        fragmentNavigator.setRootFragment(new ChooserFragment());
     }
 
     public void onBackPressed() {
-        if (fragmentNavigator.getActiveFragment() instanceof InputFragment) {
+        if (fragmentNavigator.getActiveFragment() instanceof ChooserFragment) {
             mainView.moveTaskToBack();
         } else
             fragmentNavigator.goOneBack();
