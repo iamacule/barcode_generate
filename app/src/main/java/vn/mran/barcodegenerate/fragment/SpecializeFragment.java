@@ -3,9 +3,15 @@ package vn.mran.barcodegenerate.fragment;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import vn.mran.barcodegenerate.R;
 import vn.mran.barcodegenerate.base.BaseFragment;
+import vn.mran.barcodegenerate.dialog.DialogInput;
 import vn.mran.barcodegenerate.utils.TouchEffect;
 
 /**
@@ -17,12 +23,16 @@ public class SpecializeFragment extends BaseFragment implements View.OnClickList
     private LinearLayout btnAdd;
     private LinearLayout btnDelete;
     private LinearLayout btnNext;
+    private TextView txtShowing;
+
+    private List<String> listSpecialize = new ArrayList<>();
 
     @Override
     public void initView() {
         btnAdd = (LinearLayout) view.findViewById(R.id.btnAdd);
         btnDelete = (LinearLayout) view.findViewById(R.id.btnDelete);
         btnNext = (LinearLayout) view.findViewById(R.id.btnNext);
+        txtShowing = (TextView) view.findViewById(R.id.txtShowing);
 
         TouchEffect.addAlpha(btnAdd);
         TouchEffect.addAlpha(btnDelete);
@@ -50,13 +60,36 @@ public class SpecializeFragment extends BaseFragment implements View.OnClickList
         switch (v.getId()) {
             case R.id.btnAdd:
                 Log.d(TAG, "btnAdd");
+                new DialogInput.Build(getActivity())
+                        .setTitle(getString(R.string.input_specialize))
+                        .setOnDialogInputListener(new DialogInput.OnDialogInputListener() {
+                            @Override
+                            public void onNumberReturn(int number) {
+                                listSpecialize.add((String.format("%07d", number)) + " ");
+                                initShowing();
+                            }
+                        }).show();
                 break;
             case R.id.btnDelete:
                 Log.d(TAG, "btnDelete");
+                try{
+                    listSpecialize.remove(listSpecialize.get(listSpecialize.size()-1));
+                    initShowing();
+                }catch (Exception e){
+                    Toast.makeText(getActivity(),getString(R.string.delete_fail),Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.btnNext:
                 Log.d(TAG, "btnNext");
                 break;
         }
+    }
+
+    private void initShowing() {
+        StringBuilder showingText = new StringBuilder();
+        for (String s : listSpecialize) {
+            showingText.append(s);
+        }
+        txtShowing.setText(showingText.toString().replaceAll("\\s+", System.getProperty("line.separator")));
     }
 }

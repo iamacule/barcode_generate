@@ -26,4 +26,8 @@
     <string name="create_new">Khởi tạo mới</string>
     <string name="add">Thêm</string>
     <string name="delete">Xóa</string>
+    <string name="input_specialize">Nhập số chỉ định</string>
+    <string name="cancel">Từ bỏ</string>
+    <string name="add_success">Thêm thành công</string>
+    <string name="delete_fail">Xóa không thành công</string>
 </resources>
