@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 
 import com.google.zxing.BarcodeFormat;
 
+import java.util.List;
+
 import vn.mran.barcodegenerate.R;
 import vn.mran.barcodegenerate.base.BaseFragment;
 import vn.mran.barcodegenerate.dialog.DialogConfirm;
@@ -42,6 +44,8 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
     private int from = -1;
     private int to = -1;
     private Bitmap bpLogo;
+
+    private List<Integer> listSpecialize;
 
     @Override
     public void initView() {
@@ -87,9 +91,10 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
      * @param from
      * @param to
      */
-    public void setData(int from, int to) {
+    public void setData(int from, int to, List<Integer> listSpecialize) {
         this.from = from;
         this.to = to;
+        this.listSpecialize = listSpecialize;
 
         imgLogo.setBackgroundColor(Color.WHITE);
         imgLogo.setImageBitmap(presenter.exportItem(bpLogo, presenter.encodeAsBitmap(String.format("%07d", from), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), from));
@@ -150,12 +155,12 @@ public class LogoFragment extends BaseFragment implements View.OnClickListener, 
             case Constant.ACTION_EXPORT:
                 if (cbFG.isEnabled()) {
                     try {
-                        presenter.export(bpLogo, from, to, Color.parseColor("#"+edtFBColor.getText().toString().trim()));
+                        presenter.export(bpLogo, from, to, Color.parseColor("#" + edtFBColor.getText().toString().trim()), listSpecialize);
                     } catch (Exception e) {
-                        presenter.export(bpLogo, from, to, -1);
+                        presenter.export(bpLogo, from, to, -1, listSpecialize);
                     }
                 } else {
-                    presenter.export(bpLogo, from, to, -1);
+                    presenter.export(bpLogo, from, to, -1, listSpecialize);
                 }
                 break;
         }

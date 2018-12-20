@@ -57,7 +57,7 @@ public class InputFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void checkNumberSuccess(int from, int to) {
         goTo(new LogoFragment());
-        ((LogoFragment) getActiveFragment()).setData(from, to);
+        ((LogoFragment) getActiveFragment()).setData(from, to, null);
     }
 
     @Override

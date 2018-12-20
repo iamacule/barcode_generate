@@ -25,7 +25,7 @@ public class SpecializeFragment extends BaseFragment implements View.OnClickList
     private LinearLayout btnNext;
     private TextView txtShowing;
 
-    private List<String> listSpecialize = new ArrayList<>();
+    private List<Integer> listSpecialize = new ArrayList<>();
 
     @Override
     public void initView() {
@@ -65,30 +65,35 @@ public class SpecializeFragment extends BaseFragment implements View.OnClickList
                         .setOnDialogInputListener(new DialogInput.OnDialogInputListener() {
                             @Override
                             public void onNumberReturn(int number) {
-                                listSpecialize.add((String.format("%07d", number)) + " ");
+                                listSpecialize.add(number);
                                 initShowing();
                             }
                         }).show();
                 break;
             case R.id.btnDelete:
                 Log.d(TAG, "btnDelete");
-                try{
-                    listSpecialize.remove(listSpecialize.get(listSpecialize.size()-1));
+                try {
+                    listSpecialize.remove(listSpecialize.get(listSpecialize.size() - 1));
                     initShowing();
-                }catch (Exception e){
-                    Toast.makeText(getActivity(),getString(R.string.delete_fail),Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), getString(R.string.delete_fail), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btnNext:
                 Log.d(TAG, "btnNext");
+                if (listSpecialize.size() > 0) {
+
+                    goTo(new LogoFragment());
+                    ((LogoFragment) getActiveFragment()).setData(0, listSpecialize.size() - 1, listSpecialize);
+                }
                 break;
         }
     }
 
     private void initShowing() {
         StringBuilder showingText = new StringBuilder();
-        for (String s : listSpecialize) {
-            showingText.append(s);
+        for (Integer s : listSpecialize) {
+            showingText.append((String.format("%07d",s)) + " ");
         }
         txtShowing.setText(showingText.toString().replaceAll("\\s+", System.getProperty("line.separator")));
     }

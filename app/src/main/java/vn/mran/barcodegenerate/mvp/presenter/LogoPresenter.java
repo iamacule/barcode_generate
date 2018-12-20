@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import vn.mran.barcodegenerate.R;
@@ -271,8 +272,8 @@ public class LogoPresenter {
         return dst;
     }
 
-    public void export(Bitmap logoBitmap, int from, int to, int fgColor) {
-        new ExportTask(logoBitmap, from, to, fgColor).execute(new Void[]{});
+    public void export(Bitmap logoBitmap, int from, int to, int fgColor, List<Integer> listSpecialize) {
+        new ExportTask(logoBitmap, from, to, fgColor, listSpecialize).execute(new Void[]{});
     }
 
     private class ExportTask extends AsyncTask<Void, Integer, Boolean> {
@@ -284,14 +285,16 @@ public class LogoPresenter {
         private int to;
         private int fgColor;
         private boolean isCreateMainFile = true;
+        private List<Integer> listSpecialize;
 
-        public ExportTask(Bitmap logoBitmap, int from, int to, int fgColor) {
+        public ExportTask(Bitmap logoBitmap, int from, int to, int fgColor, List<Integer> listSpecialize) {
             this.from = from;
             Log.d(TAG, "doInBackground: From : " + from);
             this.to = to;
             Log.d(TAG, "doInBackground: To : " + to);
             this.logoBitmap = logoBitmap;
             this.fgColor = fgColor;
+            this.listSpecialize = listSpecialize;
         }
 
         @Override
@@ -313,23 +316,25 @@ public class LogoPresenter {
                 mainPDFFile.open();
                 Log.d(TAG, "doInBackground: create document success");
 
-                validateFinishNumber();
-
                 for (int i = from; i <= to; i += MAX_ITEM_WIDTH) {
                     Log.d(TAG, "doInBackground: create total bitmap");
                     Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
                             Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                    totalBitmap.eraseColor(Color.WHITE);
                     Canvas canvas = new Canvas(totalBitmap);
                     Log.d(TAG, "doInBackground: create total bitmap success");
 
                     int startNumber = i;
-                    int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
+                    int stopNumber = createStopNumber(startNumber, to);
                     int pos = 0;
                     for (int j = startNumber; j <= stopNumber; j++) {
                         Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
                         publishProgress(pos + startNumber);
-                        Bitmap bp = exportItem(logoBitmap, encodeAsBitmap(String.format("%07d", j), BarcodeFormat.CODE_128, Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), j);
-                        Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT, Constant.PRINT_WIDTH);
+                        int exportNumber = createExportNumber(j);
+                        Bitmap bp = exportItem(logoBitmap, encodeAsBitmap(String.format("%07d", exportNumber), BarcodeFormat.CODE_128,
+                                Constant.PRINT_WIDTH, Constant.BARCODE_HEIGHT), exportNumber);
+                        Rect rect = new Rect(Constant.PRINT_HEIGHT * pos, 0, (Constant.PRINT_HEIGHT * pos) + Constant.PRINT_HEIGHT,
+                                Constant.PRINT_WIDTH);
                         canvas.drawBitmap(bp, null, rect, null);
                         pos++;
                     }
@@ -366,11 +371,12 @@ public class LogoPresenter {
                     for (int i = 1; i <= maxItem; i += MAX_ITEM_WIDTH) {
                         Bitmap totalBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
                                 Constant.PRINT_WIDTH, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
+                        totalBitmap.eraseColor(Color.WHITE);
                         Canvas canvas = new Canvas(totalBitmap);
                         Log.d(TAG, "doInBackground: create total bitmap success");
 
                         int startNumber = i;
-                        int stopNumber = startNumber + (MAX_ITEM_WIDTH - 1);
+                        int stopNumber = createStopNumber(startNumber, to);
                         int pos = 0;
                         for (int j = startNumber; j <= stopNumber; j++) {
                             Log.d(TAG, "doInBackground: pos = " + (pos + startNumber));
@@ -409,6 +415,20 @@ public class LogoPresenter {
             }
         }
 
+        private int createExportNumber(int j) {
+            if (listSpecialize != null) {
+                return listSpecialize.get(j);
+            }
+            return j;
+        }
+
+        private int createStopNumber(int startNumber, int to) {
+            if (startNumber + MAX_ITEM_WIDTH - 1 > to) {
+                return to;
+            }
+            return startNumber + (MAX_ITEM_WIDTH - 1);
+        }
+
         private Bitmap convertLogo(Bitmap logoBitmap, int fgColor) {
             int width = logoBitmap.getWidth();
             int height = logoBitmap.getHeight();
@@ -437,7 +457,7 @@ public class LogoPresenter {
 
         private Element createSpace(int pos) {
             int spaceHeight;
-            if (pos!=1){
+            if (pos != 1) {
                 spaceHeight = Constant.SPACE_HEIGHT - 3;
             } else
                 spaceHeight = Constant.SPACE_HEIGHT;
