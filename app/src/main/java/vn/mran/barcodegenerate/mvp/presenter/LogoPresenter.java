@@ -457,9 +457,9 @@ public class LogoPresenter {
 
         private Element createSpace(int pos) {
             int spaceHeight;
-            if (pos != 1) {
-                spaceHeight = Constant.SPACE_HEIGHT - 3;
-            } else
+//            if (pos != 1) {
+//                spaceHeight = Constant.SPACE_HEIGHT - 3;
+//            } else
                 spaceHeight = Constant.SPACE_HEIGHT;
             Bitmap spaceBitmap = Bitmap.createBitmap(Constant.PRINT_HEIGHT * MAX_ITEM_WIDTH,
                     spaceHeight, Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
