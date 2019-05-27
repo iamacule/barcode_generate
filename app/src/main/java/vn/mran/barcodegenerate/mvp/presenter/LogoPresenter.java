@@ -217,7 +217,7 @@ public class LogoPresenter {
         canvas.drawBitmap(logoBitmap, null, rectLogo, null);
 
         //Draw Barcode
-        Rect rectBarcode = new Rect(5, 119, canvas.getWidth() - 5, 186);
+        Rect rectBarcode = new Rect(5, 119, canvas.getWidth() - 5, 184);
         canvas.drawBitmap(barcodeBitmap, null, rectBarcode, null);
 
         //Draw number
